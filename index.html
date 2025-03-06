@@ -3,35 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Biometric Unlock</title>
+    <title>Fingerprint Capture on Touch</title>
+    <style>
+        body { text-align: center; background: #f5f5f5; }
+        video, canvas { display: block; margin: 10px auto; }
+        button { padding: 10px; font-size: 16px; }
+    </style>
 </head>
 <body>
-    <h2>Tap the button to unlock</h2>
-    <button onclick="authenticate()">🔓 Unlock</button>
-    <p id="status"></p>
+
+    <h2>Touch the screen to capture your fingerprint</h2>
+    <video id="camera" autoplay></video>
+    <canvas id="canvas"></canvas>
 
     <script>
-        async function authenticate() {
-            try {
-                const publicKeyCredentialRequestOptions = {
-                    challenge: new Uint8Array(32),
-                    allowCredentials: [],
-                    timeout: 60000,
-                    userVerification: "required"
-                };
+        const video = document.getElementById("camera");
+        const canvas = document.getElementById("canvas");
+        const ctx = canvas.getContext("2d");
 
-                const credential = await navigator.credentials.get({
-                    publicKey: publicKeyCredentialRequestOptions
-                });
+        // Start Camera
+        navigator.mediaDevices.getUserMedia({ video: true }).then((stream) => {
+            video.srcObject = stream;
+        });
 
-                if (credential) {
-                    document.getElementById("status").innerText = "✅ Unlocked Successfully!";
-                }
-            } catch (err) {
-                document.getElementById("status").innerText = "❌ Authentication Failed!";
-                console.error(err);
-            }
+        // Capture fingerprint when user touches the screen
+        document.addEventListener("touchstart", () => {
+            captureFingerprint();
+        });
+
+        function captureFingerprint() {
+            // Set canvas size to match video
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+
+            // Capture image from video
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            alert("📸 Fingerprint Captured! (Check canvas)");
         }
     </script>
+
 </body>
 </html>
