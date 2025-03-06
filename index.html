@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biometric Unlock</title>
+</head>
+<body>
+    <h2>Tap the button to unlock</h2>
+    <button onclick="authenticate()">🔓 Unlock</button>
+    <p id="status"></p>
+
+    <script>
+        async function authenticate() {
+            try {
+                const publicKeyCredentialRequestOptions = {
+                    challenge: new Uint8Array(32),
+                    allowCredentials: [],
+                    timeout: 60000,
+                    userVerification: "required"
+                };
+
+                const credential = await navigator.credentials.get({
+                    publicKey: publicKeyCredentialRequestOptions
+                });
+
+                if (credential) {
+                    document.getElementById("status").innerText = "✅ Unlocked Successfully!";
+                }
+            } catch (err) {
+                document.getElementById("status").innerText = "❌ Authentication Failed!";
+                console.error(err);
+            }
+        }
+    </script>
+</body>
+</html>
